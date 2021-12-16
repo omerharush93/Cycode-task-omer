@@ -38,7 +38,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          rn: true
+          rm: true
           source: "~/main.tf"
           target: "~"
 
@@ -50,6 +50,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
-            ./terraform init
-            ./terraform apply --auto-approve
+            terraform init
+            terraform apply --auto-approve
           
