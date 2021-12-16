@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  inegration:
+  integration:
     runs-on: ubuntu-latest
     steps:
     
@@ -26,11 +26,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/cycode:latest
   
-  deploy:
-    if: github.ref == 'refs/heads/master'
-    needs: inegration
-    runs-on: ubuntu-latest
-    steps:         
       - name: Copy main.tf file to remote host
         uses: appleboy/scp-action@master
         with:
@@ -39,8 +34,14 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           rm: true
-          source: "~/main.tf"
+          source: "main.tf"
           target: "~"
+  
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:         
 
       - name: Deploy k8s app on remote host using terraform
         uses: appleboy/ssh-action@master
