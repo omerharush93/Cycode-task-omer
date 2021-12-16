@@ -38,7 +38,7 @@ resource "kubernetes_deployment" "test" {
           image = "omerharush93/cycode:latest"
           name  = "myapp-container"
           port {
-            container_port = 80
+            container_port = 3000
           }
 	  env {
             name  = "DB_URI"
