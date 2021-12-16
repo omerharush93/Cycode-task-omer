@@ -27,6 +27,8 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/cycode:latest
   
   deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: build
     runs-on: ubuntu-latest
     steps:         
       - name: Copy main.tf file to remote host
