@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  inegration:
     runs-on: ubuntu-latest
     steps:
     
@@ -28,7 +28,7 @@ jobs:
   
   deploy:
     if: github.ref == 'refs/heads/master'
-    needs: build
+    needs: inegration
     runs-on: ubuntu-latest
     steps:         
       - name: Copy main.tf file to remote host
@@ -38,8 +38,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          overwrite: true
-          source: "main.tf"
+          rn: true
+          source: "~/main.tf"
           target: "~"
 
       - name: Deploy k8s app on remote host using terraform
