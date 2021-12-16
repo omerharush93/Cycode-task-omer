@@ -1,0 +1,21 @@
+node_modules
+npm-debug.log
+
+.git
+.gitignore
+.editorconfig
+
+# Compiled files
+**/.terraform/*
+**/.terragrunt-cache/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Module directory
+.terraform
+**/.idea
+**/*.iml
+
+**/.build-harness
+**/build-harness
