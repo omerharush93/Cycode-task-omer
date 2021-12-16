@@ -11,6 +11,7 @@ npm-debug.log
 *.tfstate
 *.tfstate.*
 .terraform.lock.hcl
+*.tf
 
 # Module directory
 .terraform
