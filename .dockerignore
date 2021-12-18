@@ -1,5 +1,7 @@
 node_modules
 npm-debug.log
+terrafom-files
+yamls
 
 .git
 .gitignore
