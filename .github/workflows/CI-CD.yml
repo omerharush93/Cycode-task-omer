@@ -59,7 +59,7 @@ jobs:
         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
       
       - name: Update deployment file
-        run: sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest|' yamls/deployment/deployment.yml
+        run: ls $$ sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest|' yamls/deployment/deployment.yml
 
       - name: Update configmap file
         run: sed -i 's|<DB_URI>|=${{ secrets.PROD_MONGODB_URI }}|' yamls/deployment/db-uri-configmap.yml
