@@ -57,7 +57,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         run: |
           echo "TAG=dev" >> $GITHUB_ENV
-          echo "TAG=${{ secrets.DEV_MONGODB_URI }}" >> $GITHUB_ENV
+          echo "DB_URI=${{ secrets.DEV_MONGODB_URI }}" >> $GITHUB_ENV
           echo "EKS_CLUSTER_NAME=${{ secrets.DEV_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           
                  
