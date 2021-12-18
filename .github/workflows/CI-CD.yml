@@ -65,7 +65,7 @@ jobs:
         
       - name: Terraform Apply
 #         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -var="version=$GITHUB_SHA"
+        run: terraform apply -auto-approve -var="version=$GITHUB_SHA" -var="db_uri=${{ secrets.PROD_MONGODB_URI }}"
 
       
   
