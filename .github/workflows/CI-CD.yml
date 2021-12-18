@@ -8,7 +8,10 @@ on:
 jobs:
   integration:
     runs-on: ubuntu-latest
-    steps:    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -19,9 +22,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-    
-      - name: Check out code
-        uses: actions/checkout@v2
      
       - name: Build and push Docker image
         id:   docker_build
@@ -36,6 +36,9 @@ jobs:
     needs: integration
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        
       - name: Install AWS CLI
         uses: unfor19/install-aws-cli-action@v1
         with:
