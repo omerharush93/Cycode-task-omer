@@ -42,7 +42,7 @@ resource "kubernetes_deployment" "test" {
           }
           env {
             name  = "DB_URI"
-            value = "mongodb+srv://omerharush:Zz123456@cluster0.xkhsu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+            value = ${var.db_uri}
           }
         }
       }
@@ -65,13 +65,20 @@ resource "kubernetes_service" "test" {
     }
   }
 }
-resource "kubernetes_config_map" "test" {
-  metadata {
-    name = "db-uri"
-  }
-
-  data = {
-    database_uri = ${var.db_uri}
-  }
-
+variable "db_uri" {
+  type        = string
+  description = "The DB URI of the service."
 }
+variable "version" {
+  type        = string
+  description = "Docker image tag version"
+# resource "kubernetes_config_map" "test" {
+#   metadata {
+#     name = "db-uri"
+#   }
+
+#   data = {
+#     database_uri = ${var.db_uri}
+#   }
+
+# }
