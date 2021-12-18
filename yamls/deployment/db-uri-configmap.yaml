@@ -4,5 +4,4 @@ metadata:
   name: db-uri-configmap
   namespace: myapp
 data:
-  #DB_URI: "mongodb+srv://omerharush:Zz123456@cluster0.xkhsu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
   DB_URI: <DB_URI>
