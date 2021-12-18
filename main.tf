@@ -35,14 +35,14 @@ resource "kubernetes_deployment" "test" {
       }
       spec {
         container {
-          image = "omerharush93/cycode:${var.version}"
+          image = "omerharush93/cycode:${var.tag_version}"
           name  = "myapp-container"
           port {
             container_port = 3000
           }
           env {
             name  = "DB_URI"
-            value = ${var.db_uri}
+            value = var.db_uri
           }
         }
       }
@@ -69,16 +69,7 @@ variable "db_uri" {
   type        = string
   description = "The DB URI of the service."
 }
-variable "version" {
+variable "tag_version" {
   type        = string
   description = "Docker image tag version"
-# resource "kubernetes_config_map" "test" {
-#   metadata {
-#     name = "db-uri"
-#   }
-
-#   data = {
-#     database_uri = ${var.db_uri}
-#   }
-
-# }
+}
