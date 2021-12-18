@@ -23,4 +23,4 @@ spec:
         - containerPort: 3000
         envFrom:
         - configMapRef:
-            name: db_uri-configmap
+            name: db-uri-configmap
