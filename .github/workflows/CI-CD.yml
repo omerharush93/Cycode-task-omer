@@ -16,7 +16,7 @@ jobs:
           echo "TAG=latest" >> $GITHUB_ENV
           
       - name: Set environment for DEV
-        if: github.ref != 'refs/heads/dev'
+        if: github.ref == 'refs/heads/dev'
         run: |
           echo "TAG=dev" >> $GITHUB_ENV
       
@@ -54,7 +54,7 @@ jobs:
           echo "EKS_CLUSTER_NAME=${{ secrets.PROD_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           
       - name: Set environment for DEV
-        if: github.ref != 'refs/heads/master'
+        if: github.ref == 'refs/heads/dev'
         run: |
           echo "TAG=dev" >> $GITHUB_ENV
           echo "TAG=${{ secrets.DEV_MONGODB_URI }}" >> $GITHUB_ENV
