@@ -6,7 +6,7 @@ on:
     branches: [ master ]
     
 env:
-  TAG: $(echo $GITHUB_SHA | head -c7)
+  TAG: echo $GITHUB_SHA | head -c7
 jobs:
   integration:
     runs-on: ubuntu-latest
