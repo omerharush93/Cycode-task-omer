@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "/etc/rancher/k3s/k3s.yaml"
+  config_path = "~/.kube/config"
 }
 resource "kubernetes_namespace" "test" {
   metadata {
@@ -40,7 +40,7 @@ resource "kubernetes_deployment" "test" {
           port {
             container_port = 3000
           }
-	  env {
+          env {
             name  = "DB_URI"
             value = "mongodb+srv://omerharush:Zz123456@cluster0.xkhsu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
           }
@@ -58,9 +58,8 @@ resource "kubernetes_service" "test" {
     selector = {
       app = kubernetes_deployment.test.spec.0.template.0.metadata.0.labels.app
     }
-    type = "NodePort"
+    type = "LoadBalancer"
     port {
-      node_port   = 30000
       port        = 3000
       target_port = 3000
     }
