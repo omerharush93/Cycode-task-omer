@@ -38,7 +38,13 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
-    
+      
+  
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:  
       - name: Update kubconfig for terraform
         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
                   
@@ -66,13 +72,5 @@ jobs:
       - name: Terraform Apply
 #         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -var="tag_version=${{ github.sha }}" -var="db_uri=${{ secrets.PROD_MONGODB_URI }}"
-
-      
-  
-#   deploy:
-#     if: github.ref == 'refs/heads/master'
-#     needs: integration
-#     runs-on: ubuntu-latest
-#     steps:         
 
           
