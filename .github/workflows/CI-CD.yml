@@ -5,19 +5,20 @@ on:
        - dev
        - staging
        - master
+       
 jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
       - name: Set environment for Production
         if: github.ref == 'refs/heads/master'
-        env:
-          TAG: latest
+        run: |
+          echo "TAG=latest" >> $GITHUB_ENV
           
       - name: Set environment for other envs
         if: github.ref != 'refs/heads/master'
-        env:
-          TAG: ${{ github.sha }}
+        run: |
+          echo "TAG=$GITHUB_HEAD_REF" >> $GITHUB_ENV
       
       - name: Check out code
         uses: actions/checkout@v2
@@ -47,19 +48,17 @@ jobs:
     steps:
       - name: Set environment for Production
         if: github.ref == 'refs/heads/master'
-        env:
-          ENV_NAME: PROD
-          TAG: latest
-          DB_URI: ${{ secrets.PROD_MONGODB_URI }}
-          EKS_CLUSTER_NAME: ${{ secrets.PROD_EKS_CLUSTER_NAME }}
+        run: |
+          echo "TAG=latest" >> $GITHUB_ENV
+          echo "DB_URI=${{ secrets.PROD_MONGODB_URI }}" >> $GITHUB_ENV
+          echo "EKS_CLUSTER_NAME=${{ secrets.PROD_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           
       - name: Set environment for other envs
         if: github.ref != 'refs/heads/master'
-        env:
-          ENV_NAME: $GITHUB_HEAD_REF
-          TAG: ${{ github.sha }}
-          DB_URI: ${{ secrets.${{ env.ENV_NAME }}_MONGODB_URI }}
-          EKS_CLUSTER_NAME: ${{ secrets.${{ env.ENV_NAME }}_EKS_CLUSTER_NAME }}
+        run: |
+          echo "TAG=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+          echo "TAG=${{ secrets.${GITHUB_HEAD_REF}_MONGODB_URI }}" >> $GITHUB_ENV
+          echo "EKS_CLUSTER_NAME=${{ secrets.${GITHUB_HEAD_REF}_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           
                  
       - name: Check out code
@@ -96,8 +95,7 @@ jobs:
       - name: Deploy service to EKS cluster
         run: kubectl apply -f ./yamls/deployment
         
-      - name: Rolling update deployment for latest tag
-        if: github.ref == 'refs/heads/master'
+      - name: Rolling update deployment
         run: kubectl rollout restart deployment/myapp-deployment -n myapp
                   
 #       - name: Setup Terraform
