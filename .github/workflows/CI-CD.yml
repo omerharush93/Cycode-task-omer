@@ -1,14 +1,24 @@
 name: CI
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
+    branches: 
+       - dev
+       - staging
+       - master
 jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
+      - name: Set environment for Production
+        if: github.ref == 'refs/heads/master'
+        env:
+          TAG: latest
+          
+      - name: Set environment for other envs
+        if: github.ref != 'refs/heads/master'
+        env:
+          TAG: ${{ github.sha }}
+      
       - name: Check out code
         uses: actions/checkout@v2
         
@@ -28,14 +38,30 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+          tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ env.TAG }}
       
   
   deploy:
-    if: github.ref == 'refs/heads/master'
     needs: integration
     runs-on: ubuntu-latest
     steps:
+      - name: Set environment for Production
+        if: github.ref == 'refs/heads/master'
+        env:
+          ENV_NAME: PROD
+          TAG: latest
+          DB_URI: ${{ secrets.PROD_MONGODB_URI }}
+          EKS_CLUSTER_NAME: ${{ secrets.PROD_EKS_CLUSTER_NAME }}
+          
+      - name: Set environment for other envs
+        if: github.ref != 'refs/heads/master'
+        env:
+          ENV_NAME: $GITHUB_HEAD_REF
+          TAG: ${{ github.sha }}
+          DB_URI: ${{ secrets.${{ env.ENV_NAME }}_MONGODB_URI }}
+          EKS_CLUSTER_NAME: ${{ secrets.${{ env.ENV_NAME }}_EKS_CLUSTER_NAME }}
+          
+                 
       - name: Check out code
         uses: actions/checkout@v2
         
@@ -55,20 +81,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
           
-      - name: Update kubconfig for terraform
-        run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
+      - name: Update kubconfig
+        run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
       
       - name: Update deployment file
-        run: sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest|' yamls/deployment/deployment.yaml
+        run: sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ env.TAG }}|' yamls/deployment/deployment.yaml
 
       - name: Update configmap file
-        run: sed -i 's|<DB_URI>|=${{ secrets.PROD_MONGODB_URI }}|' yamls/deployment/db-uri-configmap.yaml
+        run: sed -i 's|<DB_URI>|=${{ env.DB_URI }}|' yamls/deployment/db-uri-configmap.yaml
 
       - name: Create namepsace
         run: kubectl apply -f ./yamls/namespace.yaml
       
       - name: Deploy service to EKS cluster
         run: kubectl apply -f ./yamls/deployment
+        
+      - name: Rolling update deployment for latest tag
+        if: github.ref == 'refs/heads/master'
+        run: kubectl rollout restart deployment/myapp-deployment -n myapp
                   
 #       - name: Setup Terraform
 #         uses: hashicorp/setup-terraform@v1
