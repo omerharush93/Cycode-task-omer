@@ -59,11 +59,11 @@ jobs:
         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
 
       - name: Deploy service to EKS cluster
-      uses: steebchen/kubectl@v2.0.0
-      with:
-        config: ~/.kube/config
-        version: v1.21.0 
-        command: kubectl apply -f ./yamls
+        uses: steebchen/kubectl@v2.0.0
+        with:
+          config: ~/.kube/config
+          version: v1.21.0 
+          command: kubectl apply -f ./yamls
                   
 #       - name: Setup Terraform
 #         uses: hashicorp/setup-terraform@v1
