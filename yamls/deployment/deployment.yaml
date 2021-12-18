@@ -17,7 +17,8 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: 990388978976.dkr.ecr.us-east-2.amazonaws.com/omer-cycode:latest
+        # image: 990388978976.dkr.ecr.us-east-2.amazonaws.com/omer-cycode:latest
+        image: <IMAGE>
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
