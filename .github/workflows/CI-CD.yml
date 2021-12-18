@@ -87,7 +87,7 @@ jobs:
         run: sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ env.TAG }}|' yamls/deployment/deployment.yaml
 
       - name: Update configmap file
-        run: sed -i 's|<DB_URI>|=${{ env.DB_URI }}|' yamls/deployment/db-uri-configmap.yaml
+        run: sed -i 's|<DB_URI>|${{ env.DB_URI }}|' yamls/deployment/db-uri-configmap.yaml
 
       - name: Create namepsace
         run: kubectl apply -f ./yamls/namespace.yaml
