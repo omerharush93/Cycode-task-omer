@@ -28,7 +28,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:$(echo $GITHUB_SHA | head -c7)
+          tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
       
   
   deploy:
@@ -59,7 +59,7 @@ jobs:
         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
       
       - name: Update deployment file
-        run: sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:$(echo $GITHUB_SHA | head -c7)|' $GITHUB_WORKSPACE/yamls/deployment/deployment.yml
+        run: sed -i 's|<IMAGE>|${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest|' $GITHUB_WORKSPACE/yamls/deployment/deployment.yml
 
       - name: Update configmap file
         run: sed -i 's|<DB_URI>|=${{ secrets.PROD_MONGODB_URI }}|' $GITHUB_WORKSPACE/yamls/deployment/db-uri-configmap.yml
