@@ -35,7 +35,7 @@ resource "kubernetes_deployment" "test" {
       }
       spec {
         container {
-          image = "omerharush93/cycode:${var.tag_version}"
+          image = "990388978976.dkr.ecr.us-east-2.amazonaws.com/omer-cycode:${var.tag_version}"
           name  = "myapp-container"
           port {
             container_port = 3000
