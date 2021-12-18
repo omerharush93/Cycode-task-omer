@@ -10,15 +10,15 @@ terraform {
 provider "kubernetes" {
   config_path = "~/.kube/config"
 }
-resource "kubernetes_namespace" "test" {
-  metadata {
-    name = "myapp"
-  }
-}
+# resource "kubernetes_namespace" "test" {
+#   metadata {
+#     name = "myapp"
+#   }
+# }
 resource "kubernetes_deployment" "test" {
   metadata {
     name      = "myapp"
-    namespace = kubernetes_namespace.test.metadata.0.name
+#     namespace = kubernetes_namespace.test.metadata.0.name
   }
   spec {
     replicas = 1
@@ -35,7 +35,7 @@ resource "kubernetes_deployment" "test" {
       }
       spec {
         container {
-          image = "omerharush93/cycode:latest"
+          image = "omerharush93/cycode:${var.version}"
           name  = "myapp-container"
           port {
             container_port = 3000
@@ -52,7 +52,7 @@ resource "kubernetes_deployment" "test" {
 resource "kubernetes_service" "test" {
   metadata {
     name      = "myapp"
-    namespace = kubernetes_namespace.test.metadata.0.name
+#     namespace = kubernetes_namespace.test.metadata.0.name
   }
   spec {
     selector = {
@@ -64,4 +64,14 @@ resource "kubernetes_service" "test" {
       target_port = 3000
     }
   }
+}
+resource "kubernetes_config_map" "test" {
+  metadata {
+    name = "db-uri"
+  }
+
+  data = {
+    database_uri = ${var.db_uri}
+  }
+
 }
