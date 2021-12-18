@@ -57,30 +57,37 @@ jobs:
           
       - name: Update kubconfig for terraform
         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
+
+      - name: Deploy service to EKS cluster
+      uses: steebchen/kubectl@v2.0.0
+      with:
+        config: ~/.kube/config
+        version: v1.21.0 
+        command: kubectl apply -f ./yamls
                   
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v1
       
-      - name: Terraform Init
-        id: init
-        run: terraform init
+#       - name: Terraform Init
+#         id: init
+#         run: terraform init
         
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
+#       - name: Terraform Validate
+#         id: validate
+#         run: terraform validate
         
-      - name: Terraform Plan
-        id: plan
-#         if: github.event_name == 'pull_request'
-        run: terraform plan -var="tag_version=${{ github.sha }}" -var="db_uri=${{ secrets.PROD_MONGODB_URI }}"
-#        continue-on-error: true
+#       - name: Terraform Plan
+#         id: plan
+# #         if: github.event_name == 'pull_request'
+#         run: terraform plan -var="tag_version=${{ github.sha }}" -var="db_uri=${{ secrets.PROD_MONGODB_URI }}"
+# #        continue-on-error: true
             
-#       - name: Terraform Plan Status
-#         if: steps.plan.outcome == 'failure'
-#         run: exit 1
+# #       - name: Terraform Plan Status
+# #         if: steps.plan.outcome == 'failure'
+# #         run: exit 1
         
-      - name: Terraform Apply
-#         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -var="tag_version=${{ github.sha }}" -var="db_uri=${{ secrets.PROD_MONGODB_URI }}"
+#       - name: Terraform Apply
+# #         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#         run: terraform apply -auto-approve -var="tag_version=${{ github.sha }}" -var="db_uri=${{ secrets.PROD_MONGODB_URI }}"
 
           
