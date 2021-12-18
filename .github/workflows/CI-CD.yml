@@ -15,10 +15,10 @@ jobs:
         run: |
           echo "TAG=latest" >> $GITHUB_ENV
           
-      - name: Set environment for other envs
-        if: github.ref != 'refs/heads/master'
+      - name: Set environment for DEV
+        if: github.ref != 'refs/heads/dev'
         run: |
-          echo "TAG=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+          echo "TAG=dev" >> $GITHUB_ENV
       
       - name: Check out code
         uses: actions/checkout@v2
@@ -53,12 +53,12 @@ jobs:
           echo "DB_URI=${{ secrets.PROD_MONGODB_URI }}" >> $GITHUB_ENV
           echo "EKS_CLUSTER_NAME=${{ secrets.PROD_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           
-      - name: Set environment for other envs
+      - name: Set environment for DEV
         if: github.ref != 'refs/heads/master'
         run: |
-          echo "TAG=$GITHUB_HEAD_REF" >> $GITHUB_ENV
-          echo "TAG=${{ secrets.${GITHUB_HEAD_REF}_MONGODB_URI }}" >> $GITHUB_ENV
-          echo "EKS_CLUSTER_NAME=${{ secrets.${GITHUB_HEAD_REF}_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
+          echo "TAG=dev" >> $GITHUB_ENV
+          echo "TAG=${{ secrets.DEV_MONGODB_URI }}" >> $GITHUB_ENV
+          echo "EKS_CLUSTER_NAME=${{ secrets.DEV_EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           
                  
       - name: Check out code
