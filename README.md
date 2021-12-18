@@ -1,47 +1,93 @@
+# Full CI/CD for Nodejs service
 
-# Taking a Service to Production
+GitHub Action multi-environment CI/CD pipeline triggerd by push to any branch:
+- Build,tag and push new docker image of the service to Amazon ECR
+- Deploy latest docker image service to EKS cluster of the specific environment
 
-This Devops challenge's goal is simple.
+<img src="images/diagram.png" />
 
-Build a full integration, deployment and monitoring pipeline for a service deployed in k8s. It will allow you understand the challenges we face in Cycode everyday, and to demonstrate your skills.
+### Built With
 
-We look at the pipeline as consisting of the following stages:
+* [NodeJS](https://nodejs.org/)
+* [Docker](https://www.docker.com/)
+* [Kubernetes](https://kubernetes.io/)
+* [Terraform](https://www.terraform.io/)
+* [GitHub Actions](https://github.com/features/actions/)
 
-1. **Infrastructure as a code** - (optional) use terraform to setup k8s cluster on one of the cloud providers (AWS, GCP)
-2. **Continuous Integration** - Any change in the repository that is pushed is automatically built as a docker container and published to a docker registry.
-3. **Continuous Deployment** - Latest docker image deployed to a container platform and available to use.
-4. **Continuous Monitoring** - The service health status is always available, and alert is sent when the service is not functioning. Logs are delivered and available.
-
-## Required solution:
-**all the services can be deployed on one local k8s cluster (kind, minikube) / Managed Kubernetes as a Service (EKS, GKE)**
-
-The exercise is focused on the `CI` and `CD` stages.
-
-* Create a full _Continuous Integration_ and _Continuous Deployment_ processes as defined above.
-* The outcome should include:
-   * Configuration / script files as part of the repository.
-   * Permissions to the repository, where we can commit changes, and see that the pipeline was triggered and new docker was uploaded to the registry.
-   * URL/IP of the deployed service - so we can check it over http.
-   * Access to CI tool that we can access and see the pipeline
-   * Access to the deployment environment where we can see the deployed artifact
-* * *__Bonus:__* Continue to _Continuous Monitoring_ process as defined above (Use the `/health` endpoint in addition to logs) .
+# Getting Started
 
 ## Prerequisites
 
-This GitHub repository is a `NodeJS` demo app of a very small users service.
-Below are the instructions of how to build, run and use this service.
+1. Install terraform in /usr/bin directory
+2. An AWS account with the IAM permissions listed on the [EKS module documentation](https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/iam-permissions.md)
+3. kubectl
+4. Docker
+5. ECR repository with relevant permissions to the AWS user
 
-### Build
+## Installation
 
-   `npm install`
+### Clone repo and configure
 
-### Run
+1. Clone the repo    
+   ```sh
+   git clone https://github.com/omerharush93/Cycode-task-omer.git
+   ```
+2. Configure aws credentials
+   ```sh
+   aws configure
+   ```
+3. Login to ECR registry
+   ```sh
+   aws login
+   ```
+   
+### Provision EKS cluster using terraform
 
-   `npm run start`
+1. Navigate to terraform-files folder  
+   ```sh
+   cd terraform-files
+   ```
+2. Initialize terraform workspace  
+   ```sh
+   terraform init
+   ```
+3. View the execution plan  
+   ```sh
+   terraform plan
+   ```
+4. Execute the plan and provision the cluster
+   ```sh
+   terraform apply
+   ```
+
+### Configure kube config file to connect the cluster
+
+ ```sh
+aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
+```
+
+### Build the docker image and push to ECR registry
+
+```sh
+docker build -t ECR_REGISTRY/REPOSITORY:TAG .
+docker push ECR_REGISTRY/REPOSITORY:TAG
+```
+### Deploy the service to your EKS cluster
+
+```sh
+kubectl apply -f ./yamls/namespace.yaml
+kubectl apply -f ./yamls/deployment
+```
+
+### Get your LoadBalancer External IP to reach the service
+
+```sh
+kubectl get svc -n YOUR_NAMESPACE -o wide
+```
 
 ### Use
 
-#### http://localhost:3000/users
+#### http://LOAD_BALANCER_EXTERNAL_IP:3000/users
 
 `GET` - lists the list of existing users
 
@@ -79,7 +125,7 @@ Below are the instructions of how to build, run and use this service.
 }
 ```
 
-#### http://localhost:3000/health
+#### http://LOAD_BALANCER_EXTERNAL_IP:3000/health
 
 `GET` - report on health of the service
 
@@ -108,21 +154,4 @@ The users service works with a `MongoDB` to store its users.
 
 ### Environment Variables
 
-   `MONGO_URI - uri of the mongo DB`
-
-## Guidelines:
-
-* **all the services can be deployed on one local k8s cluster (kind, minikube) / Managed Kubernetes as a Service (EKS, GKE)**
-* Although this "users service" is very small and focused, we should be prepared for multi-environments (dev, staging, production, etc...) with full pipeline (including testing, linting, and more...) in the future. Make sure your solution is opened for such future changes.
-* use whichever k8s platform (kind, minikube, k3s, eks, gke)
-* Use whichever CI/CD tool you want.
-* Use whichever Container Registry
-* Work on local gitlab repository.
-* Make sure the solution is *__private__*, not public. Only available for you and us.
-* You can use managed services as Mongo-Atlas, Grafana-Cloud, GKE, EKS
-* For the sake of the exercise, `/health` endpoint randomly returns that the health is false.
-* For simplicity, the service logs all the requests to the console.
-
-Don't hesitate to contact us with any question.
-
-**Good Luck!**
+   `DB_URI - uri of the mongo DB` - configure on yamls/deployment/db-uri-configmap
